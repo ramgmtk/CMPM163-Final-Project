@@ -28,40 +28,31 @@
     ENDCG
     SubShader
     {
-	Tags { "Queue" = "Transparent" }
+	Tags { "RenderType" = "Opaque" }
         Pass //actual outline
         {
-		Tags { "LightMode" = "Always" }
-		ZWrite Off //stop writing to depth buffer
-		//Cull Off
-		//ZTest Always
+		Cull Front
 		CGPROGRAM
 		#pragma vertex vert
 		#pragma fragment frag
 
+		float _OutlineThickness;
 		float4 _OutlineColor;
-   		float _OutlineThickness;
 
-    		v2f vert(appdata v)
-    		{
-			//v.vertex.xyz *= _OutlineThickness;
+		
+		//credit for code to
+		//Doug valenta https://www.videopoetics.com/tutorials/pixel-perfect-outline-shaders-unity/
+		v2f vert(appdata v) {
 			v2f o;
-			o.pos = UnityObjectToClipPos(v.vertex);
 			o.normal = UnityObjectToWorldNormal(v.normal);
-
-			//credit for code below
-			//http://wiki.unity3d.com/index.php/Silhouette-Outlined_Diffuse
-			float3 norm   = mul ((float3x3)UNITY_MATRIX_IT_MV, v.normal);
-			float2 offset = TransformViewToProjection(norm.xy);
-			o.pos.xy += offset * o.pos.z * _OutlineThickness;
-
+			v.vertex.xyz += v.normal * _OutlineThickness;
+			o.pos = UnityObjectToClipPos(v.vertex);
 			o.color = _OutlineColor;
 			o.uv = v.uv;
 			return o;
-    		}
-		
-		half4 frag(v2f i) : COLOR
-		{
+		}
+
+		fixed4 frag(v2f i) : SV_TARGET {
 			return i.color;
 		}
 		ENDCG   
