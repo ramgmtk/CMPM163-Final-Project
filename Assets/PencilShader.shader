@@ -2,7 +2,7 @@
 {
 	Properties
 	{
-		_MainTex ("Texture", 2D) = "white" {}
+		_MainTex ("Texture", 2D) = "red" {}
 		_Hatch0("Hatch 0", 2D) = "white" {}
 		_Hatch1("Hatch 1", 2D) = "white" {}
 	}
@@ -19,7 +19,7 @@
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-						
+
 			struct appdata
 			{
 				float4 vertex : POSITION;
@@ -42,8 +42,7 @@
 			sampler2D _Hatch1;
 			float4 _LightColor0;
 			
-			v2f vert (appdata v)
-			{
+			v2f vert (appdata v) {
 				v2f o;
 				o.pos = UnityObjectToClipPos(v.vertex);
 				o.uv = v.uv * _MainTex_ST.xy + _MainTex_ST.zw;
@@ -99,6 +98,25 @@
 
 				return hatching;
 			}
+
+			// Only took the shading technique from reference:
+			// http://kylehalladay.com/blog/tutorial/2017/02/21/Pencil-Sketch-Effect.html
+			fixed3 Magic(float2 _uv, half _intensity, float _dist) {
+				float log2_dist = log2(_dist);
+				float uv_blend = abs(frac(log2_dist * 0.5) * 2.0 - 1.0);
+
+				half3 overbright = max(0, _intensity - 1.0);
+				half3 weightsA = saturate((_intensity * 6.0) + half3(-0, -1, -2));
+				half3 weightsB = saturate((_intensity * 6.0) + half3(-3, -4, -5));
+
+				weightsA.xy -= weightsA.yz;
+				weightsA.z -= weightsB.x;
+				weightsB.xy -= weightsB.yz;
+
+				half3 hatch0 = tex2D(_Hatch0, _uv).rgb * weightsA;
+				if(weightsA.g == 0) return 1 - tex2D(_Hatch0, _uv).rgb;
+				return fixed3(0,0,0);
+			}
 			
 			fixed4 frag (v2f i) : SV_Target {
 				fixed4 color = tex2D(_MainTex, i.uv);
@@ -106,7 +124,8 @@
 
 				fixed intensity = dot(diffuse, fixed3(0.2326, 0.7152, 0.0722));
 
-				color.rgb = HatchingConstantScale(i.uv * 3, intensity, distance(_WorldSpaceCameraPos.xyz, i.wPos) * unity_CameraInvProjection[0][0]);
+				//color.rgb = HatchingConstantScale(i.uv * 3, intensity, distance(_WorldSpaceCameraPos.xyz, i.wPos) * unity_CameraInvProjection[0][0]);
+				color.rgb -= Magic(i.uv * 3, intensity, distance(_WorldSpaceCameraPos.xyz, i.wPos) * unity_CameraInvProjection[0][0]);
 
 				return color;
 			}
