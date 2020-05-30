@@ -115,8 +115,9 @@
 			weightsB.xy -= weightsB.yz;
 
 			half3 hatch0 = tex2D(_Hatch0, _uv).rgb * weightsA;
-			if(weightsA.g == 0) return 1 - tex2D(_Hatch0, _uv).rgb;
-			return fixed3(0,0,0);
+
+			float input = weightsA.g;
+			return (1 - tex2D(_Hatch0, _uv).rgb) * floor(1-input) + fixed3(0,0,0) * floor(input);
 		}
 			
 		fixed4 frag (v2f i) : SV_Target {

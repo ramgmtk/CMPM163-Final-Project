@@ -40,7 +40,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Hatch0:
-        m_Texture: {fileID: 2800000, guid: 0fee2bc49467944168d3095135412a57, type: 3}
+        m_Texture: {fileID: 2800000, guid: 1df8130e4f5774007bd2500736ea2e13, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Hatch1:
