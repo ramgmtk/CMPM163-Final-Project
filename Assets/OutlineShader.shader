@@ -16,7 +16,7 @@
 	float3 normal : NORMAL;
 	float2 uv : TEXCOORD0;
     };
-	
+
     struct v2f
     {
 	float4 pos : POSITION;
@@ -24,7 +24,6 @@
 	float3 normal : NORMAL;
 	float2 uv : TEXCOORD0;
     };
-
     ENDCG
     SubShader
     {
@@ -55,7 +54,7 @@
 		fixed4 frag(v2f i) : SV_TARGET {
 			return i.color;
 		}
-		ENDCG   
+		ENDCG     
         }
 
 	Pass //Regular Render
@@ -72,6 +71,7 @@
 			o.pos = UnityObjectToClipPos(v.vertex);
 			o.uv = v.uv;
 			o.normal = UnityObjectToWorldNormal(v.normal);
+			o.color = _Color;
 			return o;
 		}
 
